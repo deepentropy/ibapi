@@ -1,0 +1,75 @@
+name: Update IB API
+
+on:
+  # Allow manual triggering
+  workflow_dispatch:
+
+  # Run weekly on Mondays at 9 AM UTC
+  schedule:
+    - cron: '0 9 * * 1'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Fetch download URL
+        id: fetch_url
+        run: |
+          python get_download_url.py > /tmp/url_output.txt 2>&1 || true
+
+          # Extract the URL from the output
+          if grep -q "Download URL:" /tmp/url_output.txt; then
+            URL=$(grep "Download URL:" /tmp/url_output.txt | cut -d' ' -f4)
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            echo "Found URL: $URL"
+          else
+            echo "Failed to fetch URL"
+            cat /tmp/url_output.txt
+            exit 1
+          fi
+
+      - name: Update IB API
+        if: steps.fetch_url.outputs.url != ''
+        run: |
+          python update_ibapi.py "${{ steps.fetch_url.outputs.url }}"
+
+      - name: Push changes
+        if: success()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Push the changes and tags
+          git push origin ${{ github.ref_name }} --follow-tags || echo "No changes to push"
+
+      - name: Create Release
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -n "$LATEST_TAG" ]; then
+            gh release create "$LATEST_TAG" \
+              --title "IB API $LATEST_TAG" \
+              --notes "Automated release of Interactive Brokers TWS API Python client version $LATEST_TAG" \
+              --verify-tag \
+              || echo "Release already exists or could not be created"
+          fi
