@@ -48,9 +48,9 @@ jobs:
       - name: Setup stable branch
         run: |
           # Save automation scripts from main branch
-          mkdir -p /tmp/scripts
-          cp *.py /tmp/scripts/
-          cp pyproject.toml /tmp/scripts/ 2>/dev/null || true
+          mkdir -p /tmp/automation
+          cp -r scripts /tmp/automation/
+          cp pyproject.toml /tmp/automation/ 2>/dev/null || true
 
           # Create or checkout stable branch
           if git show-ref --quiet refs/remotes/origin/stable; then
@@ -62,8 +62,9 @@ jobs:
           fi
 
           # Restore automation scripts from main
-          cp /tmp/scripts/*.py .
-          cp /tmp/scripts/pyproject.toml . 2>/dev/null || true
+          rm -rf scripts
+          cp -r /tmp/automation/scripts .
+          cp /tmp/automation/pyproject.toml . 2>/dev/null || true
 
       - name: Check for stable versions and update
         id: check
@@ -71,6 +72,7 @@ jobs:
           # Get all versions from IB website
           python3 << 'EOF'
           import sys
+          sys.path.insert(0, 'scripts')
           from get_download_url import extract_download_info, filter_mac_unix_downloads
 
           downloads = extract_download_info()
@@ -132,7 +134,7 @@ jobs:
 
             # Download and update (this will commit and tag)
             echo "  Downloading and updating..."
-            python update_ibapi.py "$URL"
+            python scripts/update_ibapi.py "$URL"
 
             # Build package
             echo "  Building package..."

@@ -1,110 +1,147 @@
-# IB API Python - Automated Publisher
+# ibapi-python
 
-This project automatically downloads the Interactive Brokers TWS API Python client and publishes it to PyPI.
+Automated publisher for the Interactive Brokers TWS API Python client on PyPI.
 
-## Overview
+[![PyPI version](https://badge.fury.io/py/ibapi-python.svg)](https://pypi.org/project/ibapi-python/)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-IB%20API-blue.svg)](https://interactivebrokers.github.io/tws-api)
 
-The Interactive Brokers TWS API is distributed as a zip file containing multiple language bindings. This project:
-
-1. Downloads the latest TWS API zip file from https://interactivebrokers.github.io/
-2. Extracts only the Python client (`IBJts/source/pythonclient`)
-3. Commits the extracted code to a git branch
-4. Tags the commit with the API version number
-5. (Future) Publishes to PyPI automatically
-
-## Quick Start
-
-### Method 1: Automatic (if web access is unrestricted)
+## 📦 Installation
 
 ```bash
-# Get the download URL from the IB website
-python get_download_url.py
-
-# Update the IB API using the URL from above
-python update_ibapi.py <download_url>
+pip install ibapi-python
 ```
 
-### Method 2: Manual URL
+## 🚀 Usage
 
-If automatic scraping doesn't work (e.g., due to firewall/proxy restrictions):
+```python
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
 
-1. Open https://interactivebrokers.github.io/ in your browser
-2. Find the download link in the table (usually the third row: `tr.linebottom:nth-child(3) > td:nth-child(2) > a`)
-3. Right-click and copy the link address
-4. Run the update script:
+class IBApp(EWrapper, EClient):
+    def __init__(self):
+        EClient.__init__(self, self)
 
-```bash
-python update_ibapi.py <download_url>
+app = IBApp()
+app.connect("127.0.0.1", 7497, clientId=1)
+app.run()
 ```
 
-Example:
-```bash
-python update_ibapi.py https://interactivebrokers.github.io/downloads/twsapi_macunix.1040.01.zip
-```
+For complete examples and documentation, visit the [official IB API documentation](https://ibkrcampus.com/ibkr-api-page/).
 
-## How It Works
+## 📋 About This Package
 
-### Version Detection
+This is an automated publisher for the Interactive Brokers TWS API Python client. The source code is from Interactive Brokers' official TWS API distribution, packaged and published to PyPI for easy installation.
 
-The version is automatically extracted from the zip filename. For example:
-- `twsapi_macunix.1040.01.zip` → version `1040.01`
-- `twsapi_macunix.1051.00.zip` → version `1051.00`
+### Two Versions Available
 
-### Git Workflow
+- **Latest**: The newest IB API version (published on `main` branch)
+- **Stable**: Previous IB API versions (published on `stable` branch)
 
-1. The Python client code is copied to the `ibapi/` directory
-2. Changes are committed with message: `Update IB API to version X.XX`
-3. A git tag is created: `vX.XX`
+All versions are automatically published to PyPI weekly.
 
-### File Structure
+## 🏗️ Project Structure
 
 ```
 ibapi-python/
-├── README.md                 # This file
-├── get_download_url.py      # Helper script to fetch download URL
-├── update_ibapi.py          # Main automation script
-├── scrape_and_publish.py    # Legacy script (alternative method)
-└── ibapi/                   # IB Python client code (created after first run)
-    ├── client.py
-    ├── wrapper.py
-    └── ...
+├── .github/
+│   └── workflows/           # GitHub Actions for automation
+│       ├── update-ibapi-latest.yml   # Latest version publisher
+│       └── update-ibapi-stable.yml   # Stable version publisher
+├── scripts/                 # Automation scripts
+│   ├── get_download_url.py  # Fetch IB API download URLs
+│   ├── update_ibapi.py      # Download and commit IB API
+│   └── check_and_update.py  # Orchestrator (legacy)
+├── ibapi/                   # IB API Python client (auto-updated)
+│   └── ibapi/
+│       ├── client.py
+│       ├── wrapper.py
+│       └── ...
+├── pyproject.toml           # Package configuration
+└── README.md
 ```
 
-## Requirements
+## 🔄 How It Works
+
+### Automated Workflow
+
+1. **Weekly Check**: GitHub Actions runs every Monday at 9:00 AM UTC
+2. **Version Detection**: Scrapes https://interactivebrokers.github.io/ for new versions
+3. **Download & Extract**: Downloads the TWS API zip and extracts the Python client
+4. **Auto-Fix**: Automatically fixes version strings and package configuration
+5. **Build & Publish**: Builds the package and publishes to PyPI
+6. **Tag & Release**: Creates git tags and GitHub releases
+
+### Version Management
+
+- Versions follow IB's format: `10.40.01`, `10.37.02`, etc.
+- Git tags: `v10.40.01`, `v10.37.02`, etc.
+- Package names: `ibapi-python==10.40.01`, `ibapi-python==10.37.02`, etc.
+
+## 🛠️ Development
+
+### Prerequisites
 
 ```bash
-pip install requests beautifulsoup4
+pip install requests beautifulsoup4 build
 ```
 
-## Manual Steps (Alternative)
-
-If you prefer to do it manually:
-
-1. Download the TWS API zip from https://interactivebrokers.github.io/
-2. Extract the zip file
-3. Copy `IBJts/source/pythonclient/*` to `ibapi/` in this repository
-4. Commit and tag:
+### Manual Update
 
 ```bash
-git add ibapi/
-git commit -m "Update IB API to version X.XX"
-git tag -a vX.XX -m "Version X.XX"
+# Get download URL
+python scripts/get_download_url.py
+
+# Update to specific version
+python scripts/update_ibapi.py https://interactivebrokers.github.io/downloads/twsapi_macunix.1040.01.zip
 ```
 
-## Future Enhancements
+### Scripts
 
-- [ ] Automatic publishing to PyPI
-- [ ] GitHub Actions workflow for scheduled checks
-- [ ] Version comparison to detect updates
-- [ ] Automated testing of the Python client
-- [ ] setup.py for PyPI packaging
+- **`scripts/get_download_url.py`**: Scrapes IB website for download URLs
+- **`scripts/update_ibapi.py`**: Downloads, extracts, fixes, and commits IB API
+  - Fixes version in `ibapi/__init__.py` (preserves leading zeros)
+  - Fixes `pyproject.toml` (removes setuptools_scm, deprecated license)
+  - Cleans `__pycache__` directories
+- **`scripts/check_and_update.py`**: Legacy orchestrator (not used by workflows)
 
-## License
+## 📝 License
 
-The IB API code is proprietary to Interactive Brokers. This automation tool is provided as-is.
+The Interactive Brokers TWS API is proprietary software owned by Interactive Brokers LLC. This package is an automated publisher that makes the official IB API Python client available on PyPI for convenience.
 
-## Support
+- IB API License: [IB API Non-Commercial License or IB API Commercial License](https://interactivebrokers.github.io/tws-api)
+- This automation tool: MIT License
+
+## 🔗 Links
+
+- **PyPI Package**: https://pypi.org/project/ibapi-python/
+- **Official IB API**: https://interactivebrokers.github.io/tws-api
+- **Documentation**: https://ibkrcampus.com/ibkr-api-page/
+- **GitHub Repository**: https://github.com/yourusername/ibapi-python
+
+## 🐛 Support
 
 For issues with:
-- The IB API itself: Contact Interactive Brokers
-- This automation tool: Open an issue in this repository
+- **The IB API itself**: Contact [Interactive Brokers](https://www.interactivebrokers.com/en/support/contact.php)
+- **This package/automation**: Open an [issue on GitHub](https://github.com/yourusername/ibapi-python/issues)
+
+## ⚙️ Configuration
+
+The package configuration is in `pyproject.toml`:
+
+```toml
+[project]
+name = "ibapi-python"
+dynamic = ["version"]  # Version from ibapi.__version__
+dependencies = ["protobuf==5.29.3"]
+
+[tool.setuptools]
+packages = ["ibapi", "ibapi.protobuf"]
+package-dir = {"" = "ibapi"}  # Maps ibapi/ibapi/* to ibapi/*
+```
+
+This ensures imports work as expected:
+```python
+from ibapi.client import EClient  # Not from ibapi.ibapi.client
+```

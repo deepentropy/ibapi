@@ -51,6 +51,7 @@ jobs:
           # Get the latest version from IB website
           python3 << 'EOF'
           import sys
+          sys.path.insert(0, 'scripts')
           from get_download_url import extract_download_info, filter_mac_unix_downloads
 
           downloads = extract_download_info()
@@ -95,7 +96,7 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
           # Download and update
-          python update_ibapi.py "$DOWNLOAD_URL"
+          python scripts/update_ibapi.py "$DOWNLOAD_URL"
 
       - name: Build package
         if: steps.check.outputs.has-new-version == 'true'
