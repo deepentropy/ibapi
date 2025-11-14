@@ -9,8 +9,8 @@ VERSION = {"major": 10, "minor": 40, "micro": 1}
 
 
 def get_version_string():
-    version = "{major}.{minor}.{micro}".format(**VERSION)
-    return version
+    # Version string with preserved leading zeros
+    return "10.40.01"
 
 
 __version__ = get_version_string()

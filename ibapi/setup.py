@@ -12,7 +12,7 @@ if sys.version_info < (3, 1):
     sys.exit("Only Python 3.1 and greater is supported")
 
 setup(
-    name="ibapi-python",
+    name="ibapi",
     version=get_version_string(),
     packages=["ibapi","ibapi/protobuf"],
     install_requires=["protobuf==5.29.3"],
