@@ -98,8 +98,13 @@ def get_target_branch(version, all_downloads):
         return "stable"
 
 
-def ensure_branch_exists(branch_name):
-    """Ensure a branch exists, create it if it doesn't"""
+def ensure_branch_exists(branch_name, base_ref=None):
+    """Ensure a branch exists, create it if it doesn't
+
+    Args:
+        branch_name: Name of the branch to ensure exists
+        base_ref: Optional git ref to create branch from (e.g., 'HEAD~1', commit hash)
+    """
     try:
         # Check if branch exists locally
         result = subprocess.run(
@@ -122,16 +127,21 @@ def ensure_branch_exists(branch_name):
             check=True
         )
         if result.stdout.strip():
-            print(f"Branch '{branch_name}' exists on remote, checking out...")
-            subprocess.run(['git', 'fetch', 'origin', f'{branch_name}:{branch_name}'], check=True)
+            print(f"Branch '{branch_name}' exists on remote, fetching...")
+            subprocess.run(['git', 'fetch', 'origin', f'{branch_name}:{branch_name}'], check=True, capture_output=True)
             return True
     except:
         pass
 
-    # Create new branch
-    print(f"Creating new branch '{branch_name}'...")
+    # Create new branch from base_ref if provided
+    print(f"Creating new branch '{branch_name}'{f' from {base_ref}' if base_ref else ''}...")
     try:
-        subprocess.run(['git', 'checkout', '-b', branch_name], check=True)
+        if base_ref:
+            # Create branch from specific ref without checking it out yet
+            subprocess.run(['git', 'branch', branch_name, base_ref], check=True, capture_output=True)
+        else:
+            # Create branch from current HEAD
+            subprocess.run(['git', 'checkout', '-b', branch_name], check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error creating branch '{branch_name}': {e}")
@@ -299,6 +309,13 @@ def main():
     failed_versions = []
     branches_updated = set()
 
+    # Get the current HEAD before any modifications (for creating stable branch)
+    try:
+        result = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True, check=True)
+        initial_head = result.stdout.strip()
+    except:
+        initial_head = None
+
     for dl in new_versions:
         version = dl['version']
         url = dl['url']
@@ -308,8 +325,15 @@ def main():
         print(f"Processing version {version} → branch '{target_branch}'")
         print(f"{'='*60}")
 
+        # Determine base ref for new branches
+        # If creating stable branch and main has been updated, use initial HEAD
+        base_ref = None
+        if target_branch == 'stable' and 'main' in branches_updated and initial_head:
+            base_ref = initial_head
+            print(f"Will create stable branch from initial state: {initial_head[:8]}")
+
         # Ensure target branch exists
-        if not ensure_branch_exists(target_branch):
+        if not ensure_branch_exists(target_branch, base_ref):
             print(f"Failed to create/access branch '{target_branch}'")
             failed_versions.append(version)
             continue
