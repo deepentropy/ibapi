@@ -23,10 +23,10 @@ jobs:
       tags: ${{ steps.check.outputs.tags }}
 
     steps:
-      - name: Checkout repository (stable branch)
+      - name: Checkout repository (main branch)
         uses: actions/checkout@v4
         with:
-          ref: stable
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -44,6 +44,26 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+
+      - name: Setup stable branch
+        run: |
+          # Save automation scripts from main branch
+          mkdir -p /tmp/scripts
+          cp *.py /tmp/scripts/
+          cp pyproject.toml /tmp/scripts/ 2>/dev/null || true
+
+          # Create or checkout stable branch
+          if git show-ref --quiet refs/remotes/origin/stable; then
+            echo "Stable branch exists on remote, checking out"
+            git checkout -b stable origin/stable || git checkout stable
+          else
+            echo "Creating new stable branch"
+            git checkout -b stable
+          fi
+
+          # Restore automation scripts from main
+          cp /tmp/scripts/*.py .
+          cp /tmp/scripts/pyproject.toml . 2>/dev/null || true
 
       - name: Check for stable versions and update
         id: check
