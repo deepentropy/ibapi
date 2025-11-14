@@ -141,7 +141,7 @@ jobs:
             rm -rf build *.egg-info
 
             # Modify package name for PyPI (add -stable suffix)
-            sed -i 's/name = "ibapi-python"/name = "ibapi-python-stable"/' pyproject.toml
+            sed -i 's/name = "ibapi"/name = "ibapi-stable"/' pyproject.toml
 
             # Build
             python -m build
@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/ibapi-python
+      url: https://pypi.org/p/ibapi
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -227,7 +227,7 @@ jobs:
             echo "Creating release for $TAG"
             gh release create "$TAG" \
               --title "IB API $VERSION (Stable)" \
-              --notes "Automated release of Interactive Brokers TWS API Python client version $VERSION. This is a **stable** version of the IB API. Install: pip install ibapi-python==$VERSION" \
+              --notes "Automated release of Interactive Brokers TWS API Python client version $VERSION. This is a **stable** version of the IB API. Install: pip install ibapi==$VERSION" \
               --verify-tag \
               || echo "Release for $TAG already exists"
           done

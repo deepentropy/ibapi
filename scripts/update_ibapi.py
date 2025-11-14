@@ -229,7 +229,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ibapi-python"
+name = "ibapi"
 dynamic = ["version"]
 description = "Interactive Brokers Python API"
 readme = "README.md"
@@ -261,8 +261,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://interactivebrokers.github.io/tws-api"
 Documentation = "https://ibkrcampus.com/ibkr-api-page/"
-Repository = "https://github.com/yourusername/ibapi-python"
-"Bug Tracker" = "https://github.com/yourusername/ibapi-python/issues"
+Repository = "https://github.com/yourusername/ibapi"
+"Bug Tracker" = "https://github.com/yourusername/ibapi/issues"
 
 [tool.setuptools]
 packages = ["ibapi", "ibapi.protobuf"]

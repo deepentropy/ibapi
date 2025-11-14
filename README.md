@@ -1,11 +1,11 @@
-# ibapi-python
+# ibapi
 
 > **⚠️ UNOFFICIAL PACKAGE** | This is an independent community project, **NOT** officially affiliated with Interactive Brokers LLC.
 
 Automated publisher for the Interactive Brokers TWS API Python client on PyPI.
 
-[![PyPI Latest](https://img.shields.io/pypi/v/ibapi-python-latest?label=latest)](https://pypi.org/project/ibapi-python-latest/)
-[![PyPI Stable](https://img.shields.io/pypi/v/ibapi-python-stable?label=stable)](https://pypi.org/project/ibapi-python-stable/)
+[![PyPI Latest](https://img.shields.io/pypi/v/ibapi-latest?label=latest)](https://pypi.org/project/ibapi-latest/)
+[![PyPI Stable](https://img.shields.io/pypi/v/ibapi-stable?label=stable)](https://pypi.org/project/ibapi-stable/)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-IB%20API%20Non--Commercial-blue.svg)](LICENSE)
 
@@ -15,18 +15,18 @@ Automated publisher for the Interactive Brokers TWS API Python client on PyPI.
 
 ### Latest Version (Recommended)
 ```bash
-pip install ibapi-python-latest
+pip install ibapi-latest
 ```
 
 ### Stable Version
 ```bash
-pip install ibapi-python-stable
+pip install ibapi-stable
 ```
 
 You can also install a specific version:
 ```bash
-pip install ibapi-python-latest==10.40.01
-pip install ibapi-python-stable==10.37.02
+pip install ibapi-latest==10.40.01
+pip install ibapi-stable==10.37.02
 ```
 
 ## 🚀 Usage
@@ -62,15 +62,15 @@ This is an **unofficial** automated publisher for the Interactive Brokers TWS AP
 
 ### Two PyPI Packages
 
-- **`ibapi-python-latest`**: The newest IB API version (from `main` branch)
-- **`ibapi-python-stable`**: Previous IB API versions (from `stable` branch)
+- **`ibapi-latest`**: The newest IB API version (from `main` branch)
+- **`ibapi-stable`**: Previous IB API versions (from `stable` branch)
 
 Both packages are automatically updated weekly when new IB API versions are released.
 
 ## 🏗️ Project Structure
 
 ```
-ibapi-python/
+ibapi/
 ├── .github/
 │   └── workflows/           # GitHub Actions for automation
 │       ├── update-ibapi-latest.yml   # Latest version publisher
@@ -104,8 +104,8 @@ ibapi-python/
 - Versions follow IB's format: `10.40.01`, `10.37.02`, etc.
 - Git tags: `v10.40.01`, `v10.37.02`, etc.
 - PyPI packages:
-  - Latest: `ibapi-python-latest==10.40.01`
-  - Stable: `ibapi-python-stable==10.37.02`
+  - Latest: `ibapi-latest==10.40.01`
+  - Stable: `ibapi-stable==10.37.02`
 
 ## 📝 License
 
@@ -135,17 +135,17 @@ See the [LICENSE](LICENSE) file for complete details.
 ## 🔗 Links
 
 - **PyPI Packages**:
-  - Latest: https://pypi.org/project/ibapi-python-latest/
-  - Stable: https://pypi.org/project/ibapi-python-stable/
+  - Latest: https://pypi.org/project/ibapi-latest/
+  - Stable: https://pypi.org/project/ibapi-stable/
 - **Official IB API**: https://interactivebrokers.github.io/tws-api
 - **Documentation**: https://ibkrcampus.com/ibkr-api-page/
-- **GitHub Repository**: https://github.com/yourusername/ibapi-python
+- **GitHub Repository**: https://github.com/yourusername/ibapi
 
 ## 🐛 Support
 
 For issues with:
 - **The IB API itself**: Contact [Interactive Brokers](https://www.interactivebrokers.com/en/support/contact.php)
-- **This package/automation**: Open an [issue on GitHub](https://github.com/yourusername/ibapi-python/issues)
+- **This package/automation**: Open an [issue on GitHub](https://github.com/yourusername/ibapi/issues)
 
 ## ⚙️ Configuration
 
@@ -153,7 +153,7 @@ The package configuration is in `pyproject.toml`:
 
 ```toml
 [project]
-name = "ibapi-python"
+name = "ibapi"
 dynamic = ["version"]  # Version from ibapi.__version__
 dependencies = ["protobuf==5.29.3"]
 
