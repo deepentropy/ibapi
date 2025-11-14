@@ -139,7 +139,15 @@ jobs:
             # Build package
             echo "  Building package..."
             rm -rf build *.egg-info
+
+            # Modify package name for PyPI (add -stable suffix)
+            sed -i 's/name = "ibapi-python"/name = "ibapi-python-stable"/' pyproject.toml
+
+            # Build
             python -m build
+
+            # Restore original package name for next iteration
+            git checkout pyproject.toml
 
             # dist/ now contains the built packages
             # They will accumulate for all processed versions

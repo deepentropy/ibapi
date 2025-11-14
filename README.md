@@ -1,15 +1,32 @@
 # ibapi-python
 
+> **⚠️ UNOFFICIAL PACKAGE** | This is an independent community project, **NOT** officially affiliated with Interactive Brokers LLC.
+
 Automated publisher for the Interactive Brokers TWS API Python client on PyPI.
 
-[![PyPI version](https://badge.fury.io/py/ibapi-python.svg)](https://pypi.org/project/ibapi-python/)
+[![PyPI Latest](https://img.shields.io/pypi/v/ibapi-python-latest?label=latest)](https://pypi.org/project/ibapi-python-latest/)
+[![PyPI Stable](https://img.shields.io/pypi/v/ibapi-python-stable?label=stable)](https://pypi.org/project/ibapi-python-stable/)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-IB%20API-blue.svg)](https://interactivebrokers.github.io/tws-api)
+[![License](https://img.shields.io/badge/license-IB%20API%20Non--Commercial-blue.svg)](LICENSE)
 
 ## 📦 Installation
 
+**Two packages available on PyPI:**
+
+### Latest Version (Recommended)
 ```bash
-pip install ibapi-python
+pip install ibapi-python-latest
+```
+
+### Stable Version
+```bash
+pip install ibapi-python-stable
+```
+
+You can also install a specific version:
+```bash
+pip install ibapi-python-latest==10.40.01
+pip install ibapi-python-stable==10.37.02
 ```
 
 ## 🚀 Usage
@@ -32,14 +49,23 @@ For complete examples and documentation, visit the [official IB API documentatio
 
 ## 📋 About This Package
 
-This is an automated publisher for the Interactive Brokers TWS API Python client. The source code is from Interactive Brokers' official TWS API distribution, packaged and published to PyPI for easy installation.
+This is an **unofficial** automated publisher for the Interactive Brokers TWS API Python client. The source code is from Interactive Brokers' official TWS API distribution, packaged and published to PyPI for easy installation.
 
-### Two Versions Available
+> **⚠️ DISCLAIMER**
+>
+> This package is **NOT officially affiliated with, endorsed by, or supported by Interactive Brokers LLC**. It is an independent community project that automates the packaging and distribution of the official IB API source code.
+>
+> - The IB API source code is proprietary to Interactive Brokers and is licensed under the [TWS API Non-Commercial License](LICENSE)
+> - This automation tool is provided "as is" without any warranties
+> - For official support, please contact [Interactive Brokers](https://www.interactivebrokers.com/en/support/contact.php)
+> - Trading involves risk. Use at your own discretion.
 
-- **Latest**: The newest IB API version (published on `main` branch)
-- **Stable**: Previous IB API versions (published on `stable` branch)
+### Two PyPI Packages
 
-All versions are automatically published to PyPI weekly.
+- **`ibapi-python-latest`**: The newest IB API version (from `main` branch)
+- **`ibapi-python-stable`**: Previous IB API versions (from `stable` branch)
+
+Both packages are automatically updated weekly when new IB API versions are released.
 
 ## 🏗️ Project Structure
 
@@ -77,45 +103,40 @@ ibapi-python/
 
 - Versions follow IB's format: `10.40.01`, `10.37.02`, etc.
 - Git tags: `v10.40.01`, `v10.37.02`, etc.
-- Package names: `ibapi-python==10.40.01`, `ibapi-python==10.37.02`, etc.
-
-## 🛠️ Development
-
-### Prerequisites
-
-```bash
-pip install requests beautifulsoup4 build
-```
-
-### Manual Update
-
-```bash
-# Get download URL
-python scripts/get_download_url.py
-
-# Update to specific version
-python scripts/update_ibapi.py https://interactivebrokers.github.io/downloads/twsapi_macunix.1040.01.zip
-```
-
-### Scripts
-
-- **`scripts/get_download_url.py`**: Scrapes IB website for download URLs
-- **`scripts/update_ibapi.py`**: Downloads, extracts, fixes, and commits IB API
-  - Fixes version in `ibapi/__init__.py` (preserves leading zeros)
-  - Fixes `pyproject.toml` (removes setuptools_scm, deprecated license)
-  - Cleans `__pycache__` directories
-- **`scripts/check_and_update.py`**: Legacy orchestrator (not used by workflows)
+- PyPI packages:
+  - Latest: `ibapi-python-latest==10.40.01`
+  - Stable: `ibapi-python-stable==10.37.02`
 
 ## 📝 License
 
-The Interactive Brokers TWS API is proprietary software owned by Interactive Brokers LLC. This package is an automated publisher that makes the official IB API Python client available on PyPI for convenience.
+This project has a **dual license structure**:
 
-- IB API License: [IB API Non-Commercial License or IB API Commercial License](https://interactivebrokers.github.io/tws-api)
-- This automation tool: MIT License
+### IB API Source Code (`ibapi/` directory)
+
+The Interactive Brokers TWS API source code is proprietary software owned by Interactive Brokers LLC and is licensed under the **[TWS API Non-Commercial License](LICENSE)**.
+
+**Key restrictions:**
+- ✅ Use for personal trading and account management
+- ✅ Develop internal proprietary tools for your own IB account
+- ❌ **NOT permitted**: Selling software to third parties
+- ❌ **NOT permitted**: Distributing software to generate indirect financial benefit (e.g., commissions)
+- ⚠️ **Requires**: Active Interactive Brokers account
+
+**For commercial use**, contact Interactive Brokers at: opensource@interactivebrokers.com
+
+**Full license text**: See [LICENSE](LICENSE) file
+
+### Automation Scripts (`scripts/` directory, workflows)
+
+The automation tooling that packages and publishes the IB API is licensed under the **MIT License**.
+
+See the [LICENSE](LICENSE) file for complete details.
 
 ## 🔗 Links
 
-- **PyPI Package**: https://pypi.org/project/ibapi-python/
+- **PyPI Packages**:
+  - Latest: https://pypi.org/project/ibapi-python-latest/
+  - Stable: https://pypi.org/project/ibapi-python-stable/
 - **Official IB API**: https://interactivebrokers.github.io/tws-api
 - **Documentation**: https://ibkrcampus.com/ibkr-api-page/
 - **GitHub Repository**: https://github.com/yourusername/ibapi-python

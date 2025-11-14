@@ -104,11 +104,17 @@ jobs:
           # Clean old artifacts
           rm -rf dist build *.egg-info
 
+          # Modify package name for PyPI (add -latest suffix)
+          sed -i 's/name = "ibapi-python"/name = "ibapi-python-latest"/' pyproject.toml
+
           # Build
           python -m build
 
           # Verify
           ls -lh dist/
+
+          # Restore original package name
+          git checkout pyproject.toml
 
       - name: Push changes and tag
         if: steps.check.outputs.has-new-version == 'true'
