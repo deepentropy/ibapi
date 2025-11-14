@@ -106,9 +106,15 @@ pip install git+https://github.com/user/ibapi-python.git@v10.37.02
 ## Next Steps
 
 ### Required for Production
-1. **Set GitHub Secret**: Add `PYPI_TOKEN` to repository secrets
-   - Go to Settings > Secrets and variables > Actions
-   - Add new secret: `PYPI_TOKEN` = your PyPI API token
+1. **Configure PyPI Trusted Publishing**:
+   - Go to https://pypi.org/manage/account/publishing/
+   - Add a new publisher for GitHub Actions:
+     - PyPI Project Name: `ibapi`
+     - Owner: `<your-github-username>`
+     - Repository name: `ibapi-python`
+     - Workflow name: `update-ibapi.yml`
+     - Environment name: `pypi`
+   - This eliminates the need for API tokens - GitHub Actions will authenticate automatically
 
 2. **Merge to Main Branch**:
    ```bash
