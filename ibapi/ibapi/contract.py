@@ -190,9 +190,6 @@ class ContractDetails(Object):
         self.fundDistributionPolicyIndicator = FundDistributionPolicyIndicator.NoneItem
         self.fundAssetType = FundAssetType.NoneItem
         self.ineligibilityReasonList = None
-        self.eventContract1 = ""
-        self.eventContractDescription1 = ""
-        self.eventContractDescription2 = ""
 
     def __str__(self):
         s = ",".join(
@@ -240,9 +237,6 @@ class ContractDetails(Object):
                 decimalMaxString(self.sizeIncrement),
                 decimalMaxString(self.suggestedSizeIncrement),
                 str(self.ineligibilityReasonList),
-                str(self.eventContract1),
-                str(self.eventContractDescription1),
-                str(self.eventContractDescription2),
             )
         )
 
