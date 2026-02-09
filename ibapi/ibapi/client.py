@@ -151,7 +151,8 @@ from ibapi.server_versions import (
     MIN_SERVER_VER_CANCEL_CONTRACT_DATA,
     MIN_SERVER_VER_ADDITIONAL_ORDER_PARAMS_1,
     MIN_SERVER_VER_ADDITIONAL_ORDER_PARAMS_2,
-    MIN_SERVER_VER_ATTACHED_ORDERS
+    MIN_SERVER_VER_ATTACHED_ORDERS,
+    MIN_SERVER_VER_CONFIG
 )
 
 from ibapi.utils import ClientException, log_
@@ -272,6 +273,7 @@ from ibapi.protobuf.UpdateDisplayGroupRequest_pb2 import UpdateDisplayGroupReque
 from ibapi.protobuf.UnsubscribeFromGroupEventsRequest_pb2 import UnsubscribeFromGroupEventsRequest as UnsubscribeFromGroupEventsRequestProto
 from ibapi.protobuf.MarketDepthExchangesRequest_pb2 import MarketDepthExchangesRequest as MarketDepthExchangesRequestProto
 from ibapi.protobuf.AttachedOrders_pb2 import AttachedOrders as AttachedOrdersProto
+from ibapi.protobuf.ConfigRequest_pb2 import ConfigRequest as ConfigRequestProto
 
 # TODO: use pylint
 
@@ -7439,4 +7441,32 @@ class EClient(object):
             return
         except Exception as ex:
             self.wrapper.error(reqId, currentTimeMillis(), FAIL_SEND_CANCEL_HISTORICAL_TICKS.code(), FAIL_SEND_CANCEL_HISTORICAL_TICKS.msg() + str(ex))
+            return
+
+    def reqConfigProtoBuf(self, configRequestProto: ConfigRequestProto):
+        if configRequestProto is None:
+            return
+        
+        self.logRequest(current_fn_name(), vars())
+    
+        reqId = configRequestProto.reqId if configRequestProto.HasField('reqId') else NO_VALID_ID
+    
+        if not self.isConnected():
+            self.wrapper.error(reqId, currentTimeMillis(), NOT_CONNECTED.code(), NOT_CONNECTED.msg())
+            return
+
+        if self.serverVersion() < MIN_SERVER_VER_CONFIG:
+            self.wrapper.error(reqId, currentTimeMillis(), UPDATE_TWS.code(), UPDATE_TWS.msg() + "  It does not support config requests.")
+            return
+        
+        try:
+            serializedString = configRequestProto.SerializeToString()
+        
+            self.sendMsgProtoBuf(OUT.REQ_CONFIG + PROTOBUF_MSG_ID, serializedString)
+        
+        except ClientException as ex:
+            self.wrapper.error(NO_VALID_ID, currentTimeMillis(), ex.code, ex.msg + ex.text)
+            return
+        except Exception as ex:
+            self.wrapper.error(reqId, currentTimeMillis(), FAIL_SEND_REQCONFIG.code(), FAIL_SEND_REQCONFIG.msg() + str(ex))
             return

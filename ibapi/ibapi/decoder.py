@@ -116,6 +116,7 @@ from ibapi.protobuf.VerifyCompleted_pb2 import VerifyCompleted as VerifyComplete
 from ibapi.protobuf.DisplayGroupList_pb2 import DisplayGroupList as DisplayGroupListProto
 from ibapi.protobuf.DisplayGroupUpdated_pb2 import DisplayGroupUpdated as DisplayGroupUpdatedProto
 from ibapi.protobuf.MarketDepthExchanges_pb2 import MarketDepthExchanges as MarketDepthExchangesProto
+from ibapi.protobuf.ConfigResponse_pb2 import ConfigResponse as ConfigResponseProto
 
 logger = logging.getLogger(__name__)
 
@@ -2648,6 +2649,12 @@ class Decoder(Object):
     
         self.wrapper.displayGroupUpdated(reqId, contractInfo)
 
+    def processConfigResponseProtoBuf(self, protobuf):
+        configResponseProto = ConfigResponseProto()
+        configResponseProto.ParseFromString(protobuf)
+    
+        self.wrapper.configResponseProtoBuf(configResponseProto)
+    
     ######################################################################
 
     def readLastTradeDate(self, fields, contract: ContractDetails, isBond: bool):
@@ -2951,5 +2958,6 @@ class Decoder(Object):
         IN.VERIFY_COMPLETED: HandleInfo(proc=processVerifyCompletedMsgProtoBuf),
         IN.DISPLAY_GROUP_LIST: HandleInfo(proc=processDisplayGroupListMsgProtoBuf),
         IN.DISPLAY_GROUP_UPDATED: HandleInfo(proc=processDisplayGroupUpdatedMsgProtoBuf),
-        IN.MKT_DEPTH_EXCHANGES: HandleInfo(proc=processMktDepthExchangesMsgProtoBuf)
+        IN.MKT_DEPTH_EXCHANGES: HandleInfo(proc=processMktDepthExchangesMsgProtoBuf),
+        IN.CONFIG_RESPONSE: HandleInfo(proc=processConfigResponseProtoBuf)
     }

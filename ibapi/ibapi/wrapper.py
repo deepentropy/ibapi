@@ -129,6 +129,7 @@ from ibapi.protobuf.VerifyCompleted_pb2 import VerifyCompleted as VerifyComplete
 from ibapi.protobuf.DisplayGroupList_pb2 import DisplayGroupList as DisplayGroupListProto
 from ibapi.protobuf.DisplayGroupUpdated_pb2 import DisplayGroupUpdated as DisplayGroupUpdatedProto
 from ibapi.protobuf.MarketDepthExchanges_pb2 import MarketDepthExchanges as MarketDepthExchangesProto
+from ibapi.protobuf.ConfigResponse_pb2 import ConfigResponse as ConfigResponseProto
 
 logger = logging.getLogger(__name__)
 
@@ -1176,4 +1177,7 @@ class EWrapper:
         logAnswer(current_fn_name(), vars())
 
     def marketDepthExchangesProtoBuf(self, marketDepthExchangesProto: MarketDepthExchangesProto):
+        logAnswer(current_fn_name(), vars())
+
+    def configResponseProtoBuf(self, configResponseProto: ConfigResponseProto):
         logAnswer(current_fn_name(), vars())
