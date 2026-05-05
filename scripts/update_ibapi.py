@@ -233,7 +233,7 @@ name = "ibapi"
 dynamic = ["version"]
 description = "Interactive Brokers Python API"
 readme = "README.md"
-requires-python = ">=3.1"
+requires-python = ">=3.10"
 authors = [
     {name = "Interactive Brokers LLC", email = "api@interactivebrokers.com"}
 ]
@@ -255,7 +255,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "protobuf==5.29.3"
+    "protobuf>=5.29.5"
 ]
 
 [project.urls]
