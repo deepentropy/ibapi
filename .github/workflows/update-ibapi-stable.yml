@@ -119,7 +119,13 @@ jobs:
           mkdir -p dist
 
           while IFS='|' read -r VERSION URL; do
-            TAG="v${VERSION}"
+            # Use branch-specific tag suffix (-stable) to separate stable releases from latest releases.
+            # This allows the same version to be released on both branches independently:
+            # - v10.47.01-latest is created when the version first appears in the latest workflow
+            # - v10.47.01-stable is created when the version later appears in older versions on stable branch
+            # Without separate tags, the deduplication check would skip versions that already have tags,
+            # preventing stable releases from ever happening once a version becomes "old" (not latest).
+            TAG="v${VERSION}-stable"
             echo "Checking version $VERSION (tag $TAG)..."
 
             # Check if tag exists
