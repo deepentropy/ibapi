@@ -100,7 +100,7 @@ ibapi/
 ### Version Management
 
 - Versions follow IB's format: `10.40.01`, `10.37.02`, etc.
-- Git tags: `v10.40.01`, `v10.37.02`, etc.
+- Git tags: `v10.47.01-latest` (latest channel), `v10.46.01-stable` (stable channel)
 - PyPI packages:
   - Latest: `ibapi-latest==10.40.01`
   - Stable: `ibapi-stable==10.37.02`
