@@ -78,7 +78,11 @@ jobs:
           # Read the version info
           LATEST_VERSION=$(head -1 /tmp/latest_info.txt)
           DOWNLOAD_URL=$(tail -1 /tmp/latest_info.txt)
-          TAG="v${LATEST_VERSION}"
+          # Use branch-specific tag suffix (-latest) to allow the stable workflow to process the same
+          # version later. Without this, both branches would use the same tag (v10.47.01), causing
+          # the stable workflow's deduplication logic to skip versions that were already tagged as latest.
+          # This way, a version can have both v10.47.01-latest (on main) and v10.47.01-stable (on stable).
+          TAG="v${LATEST_VERSION}-latest"
 
           echo "Latest version: $LATEST_VERSION"
           echo "Tag: $TAG"
