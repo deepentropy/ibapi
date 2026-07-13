@@ -1,11 +1,13 @@
 """
-Copyright (C) 2025 Interactive Brokers LLC. All rights reserved. This code is subject to the terms
+Copyright (C) 2026 Interactive Brokers LLC. All rights reserved. This code is subject to the terms
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
 """
 High level IB message info.
 """
+
+from enum import IntEnum
 
 # field types
 INT = 1
@@ -14,7 +16,7 @@ FLT = 3
 
 
 # incoming msg id's
-class IN:
+class IN(IntEnum):
     TICK_PRICE = 1
     TICK_SIZE = 2
     ORDER_STATUS = 3
@@ -103,7 +105,7 @@ class IN:
 
 
 # outgoing msg id's
-class OUT:
+class OUT(IntEnum):
     REQ_MKT_DATA = 1
     CANCEL_MKT_DATA = 2
     PLACE_ORDER = 3
