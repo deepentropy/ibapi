@@ -139,6 +139,7 @@ class Order(Object):
         # HEDGE ORDERS
         self.hedgeType = ""  # 'D' - delta, 'B' - beta, 'F' - FX, 'P' - pair
         self.hedgeParam = ""  # 'beta=X' value for beta hedge, 'ratio=Y' for pair hedge
+        self.hedgeMaxSize = UNSET_INTEGER  # type: int
 
         # Clearing info
         self.account = ""  # IB account
@@ -212,7 +213,7 @@ class Order(Object):
         self.autoCancelParent = False
         self.shareholder = ""
         self.imbalanceOnly = False
-        self.routeMarketableToBbo = False
+        self.routeMarketableToBbo = None
         self.parentPermId = 0
 
         self.usePriceMgmtAlgo = None
@@ -231,6 +232,18 @@ class Order(Object):
         self.includeOvernight = False
         self.manualOrderIndicator = UNSET_INTEGER
         self.submitter = ""
+        self.postOnly = False
+        self.allowPreOpen = False
+        self.ignoreOpenAuction = False
+        self.deactivate = False
+        self.seekPriceImprovement = None
+        self.whatIfType = UNSET_INTEGER
+
+        # attached orders
+        self.slOrderId = UNSET_INTEGER
+        self.slOrderType = ""
+        self.ptOrderId = UNSET_INTEGER
+        self.ptOrderType = ""
 
     def __str__(self):
         s = "%s,%s,%s:" % (

@@ -233,7 +233,7 @@ name = "ibapi"
 dynamic = ["version"]
 description = "Interactive Brokers Python API"
 readme = "README.md"
-requires-python = ">=3.1"
+requires-python = ">=3.10"
 authors = [
     {name = "Interactive Brokers LLC", email = "api@interactivebrokers.com"}
 ]
@@ -255,7 +255,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "protobuf==5.29.3"
+    "protobuf>=5.29.5"
 ]
 
 [project.urls]
@@ -278,8 +278,11 @@ version = {attr = "ibapi.__version__"}
     print("✓ pyproject.toml fixed (removed setuptools_scm, fixed license format)")
 
 
-def commit_and_tag(pythonclient_path, version, repo_path=None):
-    """Commit the extracted pythonclient to git and tag it"""
+def commit_and_tag(pythonclient_path, version, repo_path=None, tag_suffix=None):
+    """Commit the extracted pythonclient to git and tag it
+
+    tag_suffix: optional channel suffix (e.g. "latest" -> tag "v10.50.02-latest")
+    """
     if repo_path is None:
         repo_path = os.getcwd()
 
@@ -318,10 +321,17 @@ def commit_and_tag(pythonclient_path, version, repo_path=None):
     # Add all files
     run_git_command(['git', 'add', '.'])
 
+    # Tag name, with optional channel suffix
+    tag_name = f"v{version}-{tag_suffix}" if tag_suffix else f"v{version}"
+
     # Check if there are changes to commit
     status = run_git_command(['git', 'status', '--short'])
     if not status:
         print("No changes to commit")
+        # HEAD already contains this version: create the tag if it is missing
+        if not run_git_command(['git', 'tag', '-l', tag_name], check=False):
+            print(f"\nCreating missing tag on HEAD: {tag_name}")
+            run_git_command(['git', 'tag', '-a', tag_name, '-m', f'Version {version}'])
         return False
 
     # Commit
@@ -329,7 +339,6 @@ def commit_and_tag(pythonclient_path, version, repo_path=None):
     run_git_command(['git', 'commit', '-m', commit_message])
 
     # Create tag
-    tag_name = f"v{version}"
     print(f"\nCreating tag: {tag_name}")
 
     # Check if tag exists
@@ -360,13 +369,14 @@ def main():
     # Check if URL was provided as argument
     if len(sys.argv) < 2:
         print("\nError: Download URL required")
-        print("\nUsage: python update_ibapi.py <download_url>")
+        print("\nUsage: python update_ibapi.py <download_url> [tag_suffix]")
         print("\nExample:")
         print("  python update_ibapi.py https://interactivebrokers.github.io/downloads/twsapi_macunix.1040.01.zip")
         print("\nYou can find the latest version at: https://interactivebrokers.github.io/")
         sys.exit(1)
 
     download_url = sys.argv[1]
+    tag_suffix = sys.argv[2] if len(sys.argv) > 2 else None
     filename = os.path.basename(download_url)
 
     try:
@@ -387,7 +397,7 @@ def main():
         print(f"Extracted to: {pythonclient_path}")
 
         # Commit and tag
-        success = commit_and_tag(pythonclient_path, version)
+        success = commit_and_tag(pythonclient_path, version, tag_suffix=tag_suffix)
 
         # Clean up
         print(f"\nCleaning up temporary files...")
