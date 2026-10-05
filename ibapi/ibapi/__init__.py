@@ -19,12 +19,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """ Package implementing the Python API for the TWS/IB Gateway """
 
-VERSION = {"major": 10, "minor": 50, "micro": 2}
+VERSION = {"major": 1051, "minor": 1}
 
 
 def get_version_string():
     # Version string with preserved leading zeros
-    return "10.50.02"
+    return "10.51.01"
 
 
 __version__ = get_version_string()
