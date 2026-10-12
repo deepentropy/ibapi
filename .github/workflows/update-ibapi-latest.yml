@@ -52,21 +52,14 @@ jobs:
           python3 << 'EOF'
           import sys
           sys.path.insert(0, 'scripts')
-          from get_download_url import extract_download_info, filter_mac_unix_downloads
+          from get_download_url import extract_download_info, get_channel_download
 
-          downloads = extract_download_info()
-          mac_unix = filter_mac_unix_downloads(downloads)
+          latest = get_channel_download(extract_download_info(), 'latest')
 
-          if not mac_unix:
-              print("No downloads found")
-              sys.exit(0)
+          if not latest:
+              print("No latest download found")
+              sys.exit(1)
 
-          # Sort by version and get the highest (latest)
-          def parse_version(dl):
-              v = dl['version'].split('.')
-              return (int(v[0]), int(v[1]), int(v[2]))
-
-          latest = max(mac_unix, key=parse_version)
           print(f"Latest version: {latest['version']}")
           print(f"Download URL: {latest['url']}")
 
@@ -100,7 +93,7 @@ jobs:
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
           # Download and update
-          python scripts/update_ibapi.py "$DOWNLOAD_URL" latest
+          python scripts/update_ibapi.py "$DOWNLOAD_URL" latest "$LATEST_VERSION"
 
       - name: Build package
         if: steps.check.outputs.has-new-version == 'true'

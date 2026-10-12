@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 # Import from our other scripts
-from get_download_url import extract_download_info, filter_mac_unix_downloads
+from get_download_url import extract_download_info
 
 
 def get_existing_tags():
@@ -308,8 +308,8 @@ def main():
         sys.exit(1)
 
     # Filter to only Mac/Unix versions (they all have the same Python source)
-    downloads = filter_mac_unix_downloads(all_downloads)
-    print(f"Found {len(downloads)} Mac/Unix version(s)")
+    downloads = all_downloads
+    print(f"Found {len(downloads)} version(s)")
 
     if not downloads:
         print("No downloads found. Exiting.")

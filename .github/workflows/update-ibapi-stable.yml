@@ -69,38 +69,23 @@ jobs:
       - name: Check for stable versions and update
         id: check
         run: |
-          # Get all versions from IB website
+          # Get the stable version from IB website
           python3 << 'EOF'
           import sys
           sys.path.insert(0, 'scripts')
-          from get_download_url import extract_download_info, filter_mac_unix_downloads
+          from get_download_url import extract_download_info, get_channel_download
 
-          downloads = extract_download_info()
-          mac_unix = filter_mac_unix_downloads(downloads)
+          stable = get_channel_download(extract_download_info(), 'stable')
 
-          if not mac_unix:
-              print("No downloads found")
-              sys.exit(0)
+          if not stable:
+              print("No stable download found")
+              sys.exit(1)
 
-          # Sort by version
-          def parse_version(dl):
-              v = dl['version'].split('.')
-              return (int(v[0]), int(v[1]), int(v[2]))
-
-          sorted_downloads = sorted(mac_unix, key=parse_version)
-
-          # Get all except the latest (latest goes to main branch)
-          if len(sorted_downloads) > 1:
-              stable_versions = sorted_downloads[:-1]  # All except the last (highest)
-          else:
-              stable_versions = []
-
-          print(f"Found {len(stable_versions)} stable version(s)")
+          print(f"Stable version: {stable['version']}")
 
           # Save to file
           with open('/tmp/stable_versions.txt', 'w') as f:
-              for dl in stable_versions:
-                  f.write(f"{dl['version']}|{dl['url']}\n")
+              f.write(f"{stable['version']}|{stable['url']}\n")
           EOF
 
           # Check which stable versions are new
@@ -140,7 +125,7 @@ jobs:
 
             # Download and update (this will commit and tag)
             echo "  Downloading and updating..."
-            python scripts/update_ibapi.py "$URL" stable
+            python scripts/update_ibapi.py "$URL" stable "$VERSION"
 
             # Build package
             echo "  Building package..."

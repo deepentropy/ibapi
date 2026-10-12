@@ -130,6 +130,35 @@ def extract_pythonclient(zip_path, extract_to=None):
         return os.path.join(extract_to, base_path)
 
 
+def extract_pythonclient_from_installer(installer_path, extract_to=None):
+    """Run the Linux install4j installer unattended and locate the pythonclient directory
+
+    Returns (pythonclient_path, version) where version is read from API_VersionNum.txt
+    (e.g. 'API_Version=1051.01' -> '10.51.01').
+    """
+    if extract_to is None:
+        extract_to = tempfile.mkdtemp(prefix='twsapi_')
+
+    print(f"\nInstalling {installer_path} into {extract_to}...")
+    # -q: unattended mode, -dir: installation directory (uses the bundled JRE)
+    subprocess.run(['sh', installer_path, '-q', '-dir', extract_to], check=True)
+
+    pythonclient_path = os.path.join(extract_to, 'source', 'pythonclient')
+    if not os.path.isdir(pythonclient_path):
+        raise ValueError(f"Could not find pythonclient directory in {extract_to}")
+
+    version_file = os.path.join(extract_to, 'API_VersionNum.txt')
+    with open(version_file) as f:
+        match = re.search(r'API_Version=(\d{2})(\d{2})\.(\d{2})', f.read())
+    if not match:
+        raise ValueError(f"Could not read version from {version_file}")
+    major, minor, micro = match.groups()
+    version = f"{int(major)}.{int(minor)}.{micro}"
+
+    print(f"Found pythonclient at: {pythonclient_path} (version {version})")
+    return pythonclient_path, version
+
+
 def run_git_command(cmd, check=True):
     """Run a git command and return the output"""
     print(f"Running: {' '.join(cmd)}")
@@ -369,52 +398,40 @@ def main():
     # Check if URL was provided as argument
     if len(sys.argv) < 2:
         print("\nError: Download URL required")
-        print("\nUsage: python update_ibapi.py <download_url> [tag_suffix]")
-        print("\nExample:")
+        print("\nUsage: python update_ibapi.py <download_url> [tag_suffix] [expected_version]")
+        print("\nExamples:")
+        print("  python update_ibapi.py https://download2.interactivebrokers.com/installers/tws-api/latest/tws-api-latest-linux-x64.sh latest 10.51.01")
         print("  python update_ibapi.py https://interactivebrokers.github.io/downloads/twsapi_macunix.1040.01.zip")
-        print("\nYou can find the latest version at: https://interactivebrokers.github.io/")
+        print("\nYou can find the current versions at: https://download2.interactivebrokers.com/installers/tws-api/index.html")
         sys.exit(1)
 
     download_url = sys.argv[1]
     tag_suffix = sys.argv[2] if len(sys.argv) > 2 else None
+    expected_version = sys.argv[3] if len(sys.argv) > 3 else None
     filename = os.path.basename(download_url)
 
+    work_dir = tempfile.mkdtemp(prefix='ibapi_update_')
+    print(f"Using temporary directory: {work_dir}")
+
     try:
-        # Extract version from filename
-        version = extract_version_from_filename(filename)
+        download_path = os.path.join(work_dir, filename)
+        download_file(download_url, download_path)
+
+        if filename.endswith('.sh'):
+            # Linux install4j installer: the version is not in the filename
+            pythonclient_path, version = extract_pythonclient_from_installer(
+                download_path, extract_to=os.path.join(work_dir, 'install'))
+        else:
+            # Legacy twsapi_macunix.XXXX.XX.zip archive
+            version = extract_version_from_filename(filename)
+            pythonclient_path = extract_pythonclient(download_path, extract_to=work_dir)
         print(f"\nDetected version: {version}")
 
-        # Create temporary directory for download
-        temp_dir = tempfile.gettempdir()
-        zip_path = os.path.join(temp_dir, filename)
-        print(f"Using temporary directory: {temp_dir}")
-
-        # Download the zip file
-        download_file(download_url, zip_path)
-
-        # Extract pythonclient
-        pythonclient_path = extract_pythonclient(zip_path, extract_to=temp_dir)
-        print(f"Extracted to: {pythonclient_path}")
+        if expected_version and version != expected_version:
+            raise ValueError(f"Downloaded version {version} does not match expected version {expected_version}")
 
         # Commit and tag
         success = commit_and_tag(pythonclient_path, version, tag_suffix=tag_suffix)
-
-        # Clean up
-        print(f"\nCleaning up temporary files...")
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
-            print(f"Removed: {zip_path}")
-
-        # Clean up extracted directory
-        base_dir = pythonclient_path
-        while base_dir and base_dir != temp_dir and os.path.exists(base_dir):
-            parent = os.path.dirname(base_dir)
-            if parent == temp_dir or not parent:
-                if os.path.exists(base_dir):
-                    shutil.rmtree(base_dir)
-                    print(f"Removed: {base_dir}")
-                break
-            base_dir = parent
 
         print("\n" + "="*60)
         if success:
@@ -429,6 +446,10 @@ def main():
         import traceback
         traceback.print_exc()
         sys.exit(1)
+
+    finally:
+        print(f"\nCleaning up {work_dir}...")
+        shutil.rmtree(work_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
